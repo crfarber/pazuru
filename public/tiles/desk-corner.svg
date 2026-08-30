@@ -1,0 +1,9 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="48" height="48" fill="#0004FF"/>
+<rect x="25" y="7" width="23" height="34" fill="black"/>
+<rect x="41" width="41" height="34" transform="rotate(90 41 0)" fill="black"/>
+<path d="M46 4L44 4" stroke="black"/>
+<path d="M44 4L44 2" stroke="black"/>
+<path d="M43.5 45H4" stroke="black"/>
+<path d="M4 4L4 43.5" stroke="black"/>
+</svg>

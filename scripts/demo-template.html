@@ -1,0 +1,185 @@
+<meta charset="utf-8">
+<title>Murdoku — generator preview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #EBEEF1;
+    --panel: #F7F8F9;
+    --ink: #14181F;
+    --ink-soft: #5C6672;
+    --line: #C2CAD2;
+    --tile-surface: #14181F;
+    --tile-placeholder: #FBFBFA;
+    --signal: #C4342B;
+    --seal: #2F5D50;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 28px 20px 60px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 47px, rgba(20,24,31,.035) 47px 48px),
+      repeating-linear-gradient(0deg, transparent 0 47px, rgba(20,24,31,.035) 47px 48px),
+      var(--paper);
+    color: var(--ink);
+    font-family: 'Archivo', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; }
+
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 14px; margin-bottom: 22px; }
+
+  h1 {
+    font-size: clamp(30px, 6vw, 46px);
+    font-weight: 800;
+    letter-spacing: -.035em;
+    margin: 0;
+    text-transform: uppercase;
+  }
+
+  .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin: 6px 0 0;
+  }
+
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin: 18px 0 24px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+  }
+
+  button, select, input {
+    font: inherit;
+    border: 1.5px solid var(--ink);
+    background: var(--panel);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--ink); color: var(--panel); }
+  button:focus-visible, select:focus-visible, input:focus-visible {
+    outline: 3px solid var(--signal); outline-offset: 2px;
+  }
+  input { width: 110px; cursor: text; }
+  .primary { background: var(--ink); color: var(--panel); font-weight: 600; }
+  .primary:hover { background: var(--signal); border-color: var(--signal); }
+
+  .meta { margin-left: auto; display: flex; gap: 10px; align-items: center; color: var(--ink-soft); }
+
+  .band {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .08em;
+    border: 1.5px solid currentColor; padding: 3px 8px; border-radius: 2px;
+  }
+  .band-easy { color: var(--seal); }
+  .band-medium { color: #9A6B12; }
+  .band-hard { color: var(--signal); }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 26px; align-items: start; }
+  @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
+
+  #map { background: var(--panel); border: 2px solid var(--ink); padding: 14px; }
+  .murdoku-map { width: 100%; height: auto; display: block; }
+  .murdoku-map .grid { stroke: rgba(20,24,31,.16); stroke-width: 1; fill: none; }
+  .murdoku-map .wall { stroke: var(--ink); stroke-width: 4; fill: none; stroke-linecap: square; }
+  .murdoku-map .window { fill: var(--panel); stroke: var(--ink); stroke-width: 2; }
+  .murdoku-map .room-label rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+  .murdoku-map .room-label text {
+    font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
+    letter-spacing: .06em; fill: var(--ink);
+  }
+  .murdoku-map .marker circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2.5; }
+  .murdoku-map .marker text {
+    font-family: 'Archivo', sans-serif; font-size: 15px; font-weight: 700; fill: var(--ink);
+  }
+  .murdoku-map .marker.victim circle { fill: var(--signal); stroke: var(--ink); }
+  .murdoku-map .marker.victim text { fill: var(--panel); }
+  .murdoku-map .marker.murderer circle { fill: var(--panel); stroke: var(--signal); stroke-width: 4; }
+  .murdoku-map .marker.murderer text { fill: var(--signal); }
+
+  ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+
+  .card {
+    position: relative; background: var(--panel);
+    border: 1.5px solid var(--line); border-left: 4px solid var(--ink);
+    padding: 10px 12px;
+  }
+  .card.victim { border-left-color: var(--signal); }
+  .card.murderer { border-left-color: var(--signal); border-color: var(--signal); }
+
+  .card-head { display: flex; align-items: center; gap: 8px; }
+  .avatar {
+    width: 24px; height: 24px; display: grid; place-items: center;
+    border: 1.5px solid var(--ink); border-radius: 50%;
+    font-size: 12px; font-weight: 700;
+  }
+  .victim .avatar { background: var(--signal); color: var(--panel); border-color: var(--signal); }
+  .name { font-weight: 700; letter-spacing: -.01em; }
+  .coord {
+    margin-left: auto; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--ink-soft);
+  }
+  .clue { margin: 6px 0 0; font-size: 13.5px; line-height: 1.45; color: #2A3038; }
+
+  .stamp {
+    position: absolute; right: 10px; bottom: 8px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .14em; color: var(--signal);
+    border: 1.5px solid var(--signal); padding: 2px 6px; transform: rotate(-4deg);
+  }
+
+  .note {
+    margin-top: 14px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; line-height: 1.6; color: var(--ink-soft);
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Murdoku</h1>
+    <p class="tagline">Generator preview · phase 1 · engine + derived walls + tiles</p>
+  </header>
+
+  <div class="controls">
+    <button id="new" class="primary">New case</button>
+    <button id="reveal">Reveal the answer</button>
+    <select id="size" aria-label="Grid size">
+      <option value="6">6 × 6</option>
+      <option value="8" selected>8 × 8</option>
+      <option value="10">10 × 10</option>
+    </select>
+    <input id="seed-in" placeholder="seed" aria-label="Seed">
+    <button id="replay">Replay seed</button>
+    <span class="meta">
+      <span id="tier"></span>
+      <span id="band" class="band"></span>
+      <span>seed <b id="seed-out"></b></span>
+      <span id="timing"></span>
+    </span>
+  </div>
+
+  <div class="layout">
+    <div id="map"></div>
+    <div>
+      <ul id="suspects"></ul>
+      <p class="note">
+        Solid black furniture uses the supplied tiles. Outlined furniture
+        (chair, rug, TV, shelf) is a coded placeholder awaiting art.
+        Walls are derived from the room partition, never authored.
+      </p>
+    </div>
+  </div>
+</div>
+
+<script>/*BUNDLE*/</script>
