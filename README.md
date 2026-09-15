@@ -15,6 +15,34 @@ npm run generate -- --weeks 8 --start 2026-09-07 --out content/puzzles
 Or open `murdoku-preview.html` directly. It is the same engine and the same
 renderer, bundled into one file, no install required.
 
+## Deploy to Cloudflare Pages
+
+This is a Vite app and deploys directly on Cloudflare Pages.
+
+- Build command: `npm run build`
+- Build output directory: `dist`
+- Node version: `20` (see `.nvmrc`)
+
+### Cloudflare dashboard setup
+
+1. In Cloudflare, create a new **Pages** project.
+2. Connect GitHub repository `crfarber/pazuru`.
+3. Set the build command to `npm run build`.
+4. Set the output directory to `dist`.
+5. Configure production environment variables in Pages settings if needed.
+6. Enable automatic deploys from your target branch (for example `main`).
+7. Verify the deployed app and static assets (including `public/tiles`) load.
+8. Optionally add a custom domain via **Pages → Custom domains**.
+
+### CLI deploy (optional)
+
+With this repository's `wrangler.toml`, you can also deploy the generated build:
+
+```bash
+npm run build
+npx wrangler pages deploy dist
+```
+
 ## Layout
 
 ```
