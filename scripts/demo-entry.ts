@@ -1,5 +1,7 @@
+import { createElement } from 'react';
+import { createRoot } from 'react-dom/client';
 import { generatePuzzle } from '../src/engine/generate';
-import { renderMap } from '../src/renderer/renderMap';
+import { PazuruMap, emptyBoard } from '../src/renderer/PazuruMap';
 import { en, renderClue } from '../src/content/locales/en';
 import type { Puzzle } from '../src/engine/types';
 
@@ -8,6 +10,9 @@ let revealed = false;
 
 const $ = (id: string) => document.getElementById(id)!;
 
+/** The preview is read-only: it shows the board, it does not play on it. */
+let mapRoot: ReturnType<typeof createRoot> | null = null;
+
 const roomName = (roomId: number) =>
   en.rooms[current!.scene.rooms.find((r) => r.id === roomId)!.key];
 
@@ -15,11 +20,19 @@ function draw() {
   if (!current) return;
   const puzzle = current;
 
-  $('map').innerHTML = renderMap(puzzle, {
-    reveal: revealed,
-    roomLabel: (k) => en.rooms[k],
-    initial: (id) => en.names[puzzle.characters[id].nameIndex].charAt(0),
-  });
+  const initial = (id: number) => en.names[puzzle.characters[id].nameIndex].charAt(0);
+  mapRoot ??= createRoot($('map'));
+  mapRoot.render(
+    createElement(PazuruMap, {
+      puzzle,
+      board: emptyBoard(),
+      selected: null,
+      reveal: revealed,
+      roomLabel: (k) => en.rooms[k],
+      initial,
+      name: (id: number) => en.names[puzzle.characters[id].nameIndex],
+    }),
+  );
 
   $('seed-out').textContent = String(puzzle.seed);
   $('band').textContent = puzzle.difficulty.band;

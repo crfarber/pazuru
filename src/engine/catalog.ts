@@ -12,18 +12,19 @@ export interface ObjectSpec {
 }
 
 /**
- * The rules define eight object types. Three have finished tiles; the rest use
- * placeholder vectors so the clue space is complete. Swapping a placeholder for
- * real art is one tile file and one renderer case.
+ * Catalogue for this build: bed + sofa are the multi-cell seats; table and desk
+ * are blocked anchors (desk may bend into an L). Shelf, rug and box are out —
+ * sofa replaces rug in the clue space. Swapping a placeholder for real art is
+ * one tile file and one renderer case.
  */
 export const OBJECTS: Record<ObjectType, ObjectSpec> = {
   bed: { occupiable: true, sizes: [2], canBend: false, hasArt: true },
+  sofa: { occupiable: true, sizes: [2, 3], canBend: false, hasArt: false },
+  table: { occupiable: false, sizes: [2, 3], canBend: false, hasArt: false },
   desk: { occupiable: false, sizes: [2, 3], canBend: true, hasArt: true },
   plant: { occupiable: false, sizes: [1], canBend: false, hasArt: true },
   chair: { occupiable: true, sizes: [1], canBend: false, hasArt: false },
-  rug: { occupiable: true, sizes: [2, 3], canBend: false, hasArt: false },
   tv: { occupiable: false, sizes: [1], canBend: false, hasArt: false },
-  shelf: { occupiable: false, sizes: [2, 3], canBend: false, hasArt: false },
 };
 
 export const OBJECT_TYPES = Object.keys(OBJECTS) as ObjectType[];
@@ -40,9 +41,8 @@ export interface FurniturePlan {
 export const ROOM_FURNITURE: Record<RoomKey, FurniturePlan[]> = {
   bedroom: [
     { type: 'bed', min: 1, max: 1 },
-    { type: 'rug', min: 0, max: 1 },
     { type: 'plant', min: 0, max: 1 },
-    { type: 'shelf', min: 0, max: 1 },
+    { type: 'chair', min: 0, max: 1 },
   ],
   kids: [
     { type: 'bed', min: 1, max: 1 },
@@ -51,26 +51,25 @@ export const ROOM_FURNITURE: Record<RoomKey, FurniturePlan[]> = {
     { type: 'plant', min: 0, max: 1 },
   ],
   living: [
-    { type: 'rug', min: 1, max: 1 },
+    { type: 'sofa', min: 1, max: 1 },
     { type: 'tv', min: 1, max: 1 },
+    { type: 'table', min: 0, max: 1 },
     { type: 'chair', min: 1, max: 2 },
-    { type: 'plant', min: 1, max: 2 },
+    { type: 'plant', min: 0, max: 1 },
   ],
   office: [
     { type: 'desk', min: 1, max: 2 },
+    { type: 'table', min: 0, max: 1 },
     { type: 'chair', min: 1, max: 2 },
-    { type: 'shelf', min: 0, max: 1 },
     { type: 'plant', min: 0, max: 1 },
   ],
   hall: [
-    { type: 'plant', min: 0, max: 1 },
     { type: 'chair', min: 0, max: 1 },
-    { type: 'shelf', min: 0, max: 1 },
+    { type: 'plant', min: 0, max: 1 },
   ],
   bathroom: [
     { type: 'plant', min: 0, max: 1 },
-    { type: 'shelf', min: 0, max: 1 },
-    { type: 'rug', min: 0, max: 1 },
+    { type: 'chair', min: 0, max: 1 },
   ],
 };
 

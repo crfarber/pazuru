@@ -83,23 +83,25 @@
   @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
 
   #map { background: var(--panel); border: 2px solid var(--ink); padding: 14px; }
-  .murdoku-map { width: 100%; height: auto; display: block; }
-  .murdoku-map .grid { stroke: rgba(20,24,31,.16); stroke-width: 1; fill: none; }
-  .murdoku-map .wall { stroke: var(--ink); stroke-width: 4; fill: none; stroke-linecap: square; }
-  .murdoku-map .window { fill: var(--panel); stroke: var(--ink); stroke-width: 2; }
-  .murdoku-map .room-label rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
-  .murdoku-map .room-label text {
+  .pazuru-map { width: 100%; height: auto; display: block; }
+  .pazuru-map .grid { stroke: rgba(20,24,31,.16); stroke-width: 1; fill: none; }
+  .pazuru-map .wall { stroke: var(--ink); stroke-width: 4; fill: none; stroke-linecap: square; }
+  .pazuru-map .window rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+  .pazuru-map .window .window-pane { fill: color-mix(in srgb, var(--panel) 55%, #7BA3C4); stroke: none; }
+  .pazuru-map .window path { stroke: var(--ink); stroke-width: 1.5; fill: none; }
+  .pazuru-map .room-label rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+  .pazuru-map .room-label text {
     font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
     letter-spacing: .06em; fill: var(--ink);
   }
-  .murdoku-map .marker circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2.5; }
-  .murdoku-map .marker text {
+  .pazuru-map .marker circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2.5; }
+  .pazuru-map .marker text {
     font-family: 'Archivo', sans-serif; font-size: 15px; font-weight: 700; fill: var(--ink);
   }
-  .murdoku-map .marker.victim circle { fill: var(--signal); stroke: var(--ink); }
-  .murdoku-map .marker.victim text { fill: var(--panel); }
-  .murdoku-map .marker.murderer circle { fill: var(--panel); stroke: var(--signal); stroke-width: 4; }
-  .murdoku-map .marker.murderer text { fill: var(--signal); }
+  .pazuru-map .marker.victim circle { fill: var(--signal); stroke: var(--ink); }
+  .pazuru-map .marker.victim text { fill: var(--panel); }
+  .pazuru-map .marker.murderer circle { fill: var(--panel); stroke: var(--signal); stroke-width: 4; }
+  .pazuru-map .marker.murderer text { fill: var(--signal); }
 
   ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 
@@ -136,3 +138,66 @@
     margin-top: 14px; font-family: 'IBM Plex Mono', monospace;
     font-size: 11px; line-height: 1.6; color: var(--ink-soft);
   }
+
+  /* --- the board the player writes on ------------------------------------
+     Two layers, neither of them checked against the solution: pencil marks
+     for what is still possible, committed markers for what you have decided. */
+
+  .board-bar {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    margin-bottom: 10px;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+  }
+  .modes { display: flex; }
+  .mode { padding: 6px 12px; border-radius: 0; }
+  .mode:first-child { border-right-width: 0; }
+  .mode.on { background: var(--ink); color: var(--panel); }
+  .mode.on kbd { border-color: var(--panel); }
+  .board-bar .hint { color: var(--ink-soft); }
+  .board-bar > button:last-child { padding: 6px 12px; }
+  .board-bar > button:last-child:disabled { opacity: .4; cursor: default; }
+  .board-bar > button:last-child:disabled:hover { background: var(--panel); color: var(--ink); }
+
+  kbd {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    border: 1px solid currentColor; border-radius: 2px;
+    padding: 0 3px; margin-left: 5px; opacity: .7;
+  }
+
+  .pazuru-map .hit { fill: transparent; cursor: pointer; }
+  .pazuru-map .hit:hover { fill: rgba(20,24,31,.10); }
+  /* A tabbed cell is shown by its own tint; the UA ring lands outside the
+     viewBox and reads as a stray gold box on the map. */
+  .pazuru-map .hit:focus { outline: none; }
+  .pazuru-map .hit:focus-visible { fill: rgba(196,52,43,.20); }
+  /* Cells nobody may ever stand on. A printed rule, not a hint. */
+  .pazuru-map .hit.blocked { pointer-events: none; }
+
+  .pazuru-map .player-layer { pointer-events: none; }
+  .pazuru-map .player-layer.dim { opacity: .3; }
+
+  .pazuru-map .note {
+    font-family: 'IBM Plex Mono', monospace; font-weight: 600;
+    fill: var(--ink-soft);
+  }
+  .pazuru-map .note.active { fill: var(--signal); }
+
+  .pazuru-map .placed circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2.5; }
+  .pazuru-map .placed text {
+    font-family: 'Archivo', sans-serif; font-size: 15px; font-weight: 700; fill: var(--ink);
+  }
+  .pazuru-map .placed.active circle { stroke-width: 4; }
+  /* Two of your own placements share a row or column. Says nothing about
+     whether either of them is in the right square. */
+  .pazuru-map .placed.conflict circle { stroke: var(--signal); stroke-dasharray: 5 3; }
+  .pazuru-map .placed.conflict text { fill: var(--signal); }
+
+  li > .card {
+    display: block; width: 100%; text-align: left;
+    font: inherit; border-radius: 0; cursor: pointer;
+  }
+  button.card:hover { background: #E9EDF1; color: inherit; }
+  .card.selected { box-shadow: inset 0 0 0 1.5px var(--ink); background: #E9EDF1; }
+  .card.conflict { border-color: var(--signal); }
+  .slot { margin-left: auto; margin-right: 0; }
+  .card .coord { margin-left: 8px; }

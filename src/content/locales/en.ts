@@ -32,12 +32,12 @@ export const en: Locale = {
 
   objects: {
     bed: { name: 'bed', article: 'a' },
+    sofa: { name: 'sofa', article: 'a' },
+    table: { name: 'table', article: 'a' },
     desk: { name: 'desk', article: 'a' },
     plant: { name: 'plant', article: 'a' },
     chair: { name: 'chair', article: 'a' },
-    rug: { name: 'rug', article: 'a' },
     tv: { name: 'TV', article: 'a' },
-    shelf: { name: 'shelf', article: 'a' },
   },
 
   names: [

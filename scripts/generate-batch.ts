@@ -1,9 +1,29 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { createElement } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { generatePuzzle } from '../src/engine/generate';
-import { renderMap } from '../src/renderer/renderMap';
+import { PazuruMap, emptyBoard } from '../src/renderer/PazuruMap';
 import { en, renderClue } from '../src/content/locales/en';
-import type { DifficultyBand, Puzzle } from '../src/engine/types';
+import type { DifficultyBand, Puzzle, RoomKey } from '../src/engine/types';
+
+/**
+ * The board is a component now, so publication renders it to static markup
+ * rather than keeping a second string renderer that could drift from it.
+ * A published puzzle carries frozen markup: a later change here can never
+ * alter a puzzle that has already gone out.
+ */
+const mapMarkup = (puzzle: Puzzle): string =>
+  renderToStaticMarkup(
+    createElement(PazuruMap, {
+      puzzle,
+      board: emptyBoard(),
+      selected: null,
+      roomLabel: (k: RoomKey) => en.rooms[k],
+      initial: (id: number) => en.names[puzzle.characters[id].nameIndex].charAt(0),
+      name: (id: number) => en.names[puzzle.characters[id].nameIndex],
+    }),
+  );
 
 /**
  * Generation is rejection sampling, so cost per puzzle varies. Producing a
@@ -78,7 +98,7 @@ function publish(puzzle: Puzzle, date: Date, slot: Published['slot'], n: number)
         rooms,
       },
     },
-    svg: renderMap(puzzle, { roomLabel: (k) => en.rooms[k] }),
+    svg: mapMarkup(puzzle),
   };
 }
 

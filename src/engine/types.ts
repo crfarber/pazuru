@@ -7,7 +7,7 @@ export interface Cell {
 /** Compass direction, used for tile rotation and adjacency. */
 export type Dir = 'N' | 'E' | 'S' | 'W';
 
-export type ObjectType = 'bed' | 'desk' | 'plant' | 'chair' | 'rug' | 'tv' | 'shelf';
+export type ObjectType = 'bed' | 'sofa' | 'table' | 'desk' | 'plant' | 'chair' | 'tv';
 
 /** Room archetype key. Rendered per locale, never stored as display text. */
 export type RoomKey = 'bedroom' | 'kids' | 'living' | 'office' | 'hall' | 'bathroom';

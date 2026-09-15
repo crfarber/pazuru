@@ -1,4 +1,4 @@
-# Murdoku — Complete Rules Specification
+# Pazuru — Complete Rules Specification
 
 Source: scanned pages 4–7 (tutorial + object list + solving tips) and cases 1–2 of the Italian edition. Italian keywords are kept in parentheses because clue text must be generated in the game's language.
 
@@ -39,10 +39,13 @@ A cell is either:
 ### 2.4 Objects (*oggetti*)
 
 Objects sit on the grid and may span one or more cells:
-- **Single cell:** chair, plant.
-- **Multi-cell:** bed, table, rug, shelf, box, TV unit (footprint varies).
+- **Single cell:** chair, plant, TV.
+- **Multi-cell (max 3):** bed (2), sofa (2–3), table (2–3), desk (2–3, may L).
 
 An object never spans two rooms.
+
+**This build:** sofa replaces the published *tappeto* (rug) in the clue space.
+Shelf (*scaffale*) and box (*scatola*) are not used.
 
 ---
 
@@ -53,20 +56,19 @@ An object never spans two rooms.
 | Object | Italian | Notes |
 |---|---|---|
 | Chair | *sedia* | 1 cell |
-| Rug | *tappeto* | multi-cell |
-| Bed | *letto* | multi-cell |
+| Sofa | *divano* | multi-cell (replaces rug in this build) |
+| Bed | *letto* | 2 cells |
 
-A person standing on one of these is described as being *on* it: "Era sul letto", "Era seduto sulla sedia", "Era sul tappeto".
+A person standing on one of these is described as being *on* it: "Era sul letto", "Era seduto sulla sedia", "Era sul divano".
 
 ### 3.2 Cannot be occupied (*non possono essere occupati*)
 
-| Object | Italian |
-|---|---|
-| Table | *tavolo* |
-| TV | *TV* |
-| Plant | *pianta* |
-| Shelf | *scaffale* |
-| Box | *scatola* |
+| Object | Italian | Notes |
+|---|---|---|
+| Table | *tavolo* | 2–3 cells |
+| Desk | *scrivania* | 2–3 cells, may bend into an L |
+| TV | *TV* | 1 cell |
+| Plant | *pianta* | 1 cell |
 
 These cells are permanently blocked for all characters, including the victim. They exist purely as reference points for adjacency clues.
 
@@ -98,9 +100,9 @@ The book's own tip softens this to "in most grids", so treat "exactly one per ro
 
 A character may stand on:
 - an empty floor cell, or
-- a cell belonging to a chair, rug, or bed.
+- a cell belonging to a chair, sofa, or bed.
 
-A character may never stand on a table, TV, plant, shelf, or box.
+A character may never stand on a table, desk, TV, or plant.
 
 ### 4.3 One person per cell
 
@@ -412,9 +414,9 @@ Because puzzles are generated ahead (§12.2), render every locale at publication
 
 These are not resolved by the printed rules and need a decision before implementation:
 
-1. **Two people on the same multi-cell object.** Can two characters occupy different cells of the same bed or rug? Not prohibited by the text, and not demonstrated in any case.
+1. **Two people on the same multi-cell object.** Can two characters occupy different cells of the same bed or sofa? Not prohibited by the text, and not demonstrated in any case.
 2. **Does `di fronte a` mean anything other than "touching the window edge"?** A stricter reading would be "directly opposite across the window", which for an interior window would mean the two cells face each other. The printed definition ("adjacent to both") supports the looser reading.
 3. **Room shapes.** All published rooms are rectangles. Confirm whether non-rectangular rooms are permitted.
-4. **Object footprints.** Beds appear as 2 cells, tables and rugs vary. Fix a canonical footprint table if you intend to render maps programmatically.
+4. **Object footprints.** Beds are 2 cells; sofa, table and desk are 2–3 (desk may L). Chair, plant and TV are 1.
 5. **Negative clues.** No published case uses "was not in…". Decide whether to support them.
 6. **Multiple objects of the same type in one room.** Supported implicitly, but clue phrasing uses the indefinite article ("una pianta"), so it stays ambiguous by design.

@@ -1,4 +1,4 @@
-import type { Dir, ObjectType } from '../engine/types';
+import type { Cell, Dir, ObjectType } from '../engine/types';
 
 export const CELL = 48;
 
@@ -10,6 +10,9 @@ export const CELL = 48;
  *
  * Each tile declares the direction its surface connects toward, in its
  * unrotated form. The renderer rotates from there.
+ *
+ * Sofa and table are drawn as one continuous run (see `runBody`), not sliced
+ * into start/middle/end cells — that avoids seam mismatch at cell boundaries.
  */
 
 const rot = (deg: number, body: string): string =>
@@ -37,10 +40,10 @@ const bedFeet = `
   <path d="M4.5 44L42.5 44L42.5 3.5L4.5 3.5" stroke="${INK}" fill="none"/>
   <rect x="0" y="7" width="40" height="34" fill="${SURFACE}"/>`;
 
-/** End of a desk run. Connects West. */
+/** End of a desk run. Connects West. Fill/stroke y-values match deskMiddle. */
 const deskEnd = `
-  <path d="M4.5 44.5L42.5 44.5L42.5 4L4.5 4" stroke="${INK}" fill="none"/>
-  <rect x="0" y="7.5" width="40" height="34" fill="${SURFACE}"/>`;
+  <path d="M4.5 45L42.5 45L42.5 4L4.5 4" stroke="${INK}" fill="none"/>
+  <rect x="0" y="7" width="40" height="34" fill="${SURFACE}"/>`;
 
 /** Middle of a desk run. Connects West and East. */
 const deskMiddle = `
@@ -74,38 +77,38 @@ const tv = `
   <rect x="6" y="12" width="36" height="22" rx="2" fill="${PLACEHOLDER}" stroke="${INK}"/>
   <path d="M18 40h12M24 34v6" stroke="${INK}" stroke-width="2"/>`;
 
-type Edge = 'single' | 'start' | 'middle' | 'end';
-
 /**
- * A run of cells has to read as one object, so only the extremities draw an end
- * cap. Drawing a closed outline per cell would slice a rug into loose tiles.
+ * One continuous silhouette for a straight multi-cell run. Drawn in local
+ * coords of the first cell; length spans `cells` along the run axis.
  */
-const runTile = (edge: Edge, vertical: boolean, inset: number, extra = ''): string => {
-  const x0 = edge === 'start' || edge === 'single' ? 4 : 0;
-  const x1 = edge === 'end' || edge === 'single' ? 44 : 48;
+export function runBody(
+  kind: 'sofa' | 'table',
+  cells: number,
+  vertical: boolean,
+): string {
+  const inset = kind === 'sofa' ? 6 : 8;
+  const len = cells * CELL;
+  const x0 = inset;
   const y0 = inset;
-  const y1 = 48 - inset;
+  const w = vertical ? CELL - inset * 2 : len - inset * 2;
+  const h = vertical ? len - inset * 2 : CELL - inset * 2;
 
-  const caps: string[] = [];
-  if (edge === 'start' || edge === 'single') caps.push(`M${x0} ${y0}V${y1}`);
-  if (edge === 'end' || edge === 'single') caps.push(`M${x1} ${y0}V${y1}`);
+  if (kind === 'sofa') {
+    // Back cushion along the far long edge, seat body in front.
+    const back = vertical
+      ? `<rect x="${x0}" y="${y0}" width="10" height="${h}" fill="${PLACEHOLDER}" stroke="${INK}"/>`
+      : `<rect x="${x0}" y="${y0}" width="${w}" height="10" fill="${PLACEHOLDER}" stroke="${INK}"/>`;
+    const seat = vertical
+      ? `<rect x="${x0 + 10}" y="${y0}" width="${w - 10}" height="${h}" rx="2" fill="${SURFACE}" stroke="${INK}"/>`
+      : `<rect x="${x0}" y="${y0 + 10}" width="${w}" height="${h - 10}" rx="2" fill="${SURFACE}" stroke="${INK}"/>`;
+    return `${back}${seat}`;
+  }
 
-  const body = `
-    <rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" fill="${PLACEHOLDER}"/>
-    <path d="M${x0} ${y0}H${x1} M${x0} ${y1}H${x1} ${caps.join(' ')}" stroke="${INK}" fill="none"/>
-    ${extra.replace(/\{x0\}/g, String(x0)).replace(/\{x1\}/g, String(x1))}`;
-
-  return vertical ? rot(90, body) : body;
-};
-
-const shelfTile = (edge: Edge, vertical: boolean): string =>
-  runTile(edge, vertical, 10, `<path d="M{x0} 24H{x1}" stroke="${INK}" fill="none"/>`);
-
-const rugTile = (edge: Edge, vertical: boolean): string =>
-  runTile(edge, vertical, 6, `<path d="M{x0} 11H{x1} M{x0} 37H{x1}" stroke="${INK}" stroke-dasharray="4 4" fill="none"/>`);
-
-const edgeOf = (index: number, total: number): Edge =>
-  total === 1 ? 'single' : index === 0 ? 'start' : index === total - 1 ? 'end' : 'middle';
+  // Table: single slab with a cross line so it reads as furniture, not floor.
+  return `
+    <rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="2" fill="${PLACEHOLDER}" stroke="${INK}"/>
+    <path d="M${x0 + 4} ${y0 + h / 2}H${x0 + w - 4}" stroke="${INK}" fill="none"/>`;
+}
 
 // --- public API -------------------------------------------------------------
 
@@ -122,8 +125,7 @@ export interface TileRequest {
 
 /** Returns the SVG body for one cell of one object, already rotated. */
 export function tileBody(req: TileRequest): string {
-  const { type, index, total, prev, next } = req;
-  const vertical = (next ?? prev) === 'N' || (next ?? prev) === 'S';
+  const { type, index, prev, next } = req;
 
   switch (type) {
     case 'bed':
@@ -160,9 +162,20 @@ export function tileBody(req: TileRequest): string {
       return chair;
     case 'tv':
       return tv;
-    case 'shelf':
-      return shelfTile(edgeOf(index, total), vertical);
-    case 'rug':
-      return rugTile(edgeOf(index, total), vertical);
+
+    // Sofa and table are rendered once per object via `runBody`, not per cell.
+    case 'sofa':
+    case 'table':
+      return '';
   }
+}
+
+/** Whether this object type is drawn as one continuous run instead of per-cell. */
+export const isRunObject = (t: ObjectType): t is 'sofa' | 'table' =>
+  t === 'sofa' || t === 'table';
+
+/** Axis of a straight run from its ordered cells. */
+export function runVertical(cells: Cell[]): boolean {
+  if (cells.length < 2) return false;
+  return cells[0].x === cells[1].x;
 }

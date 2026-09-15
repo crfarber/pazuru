@@ -1,5 +1,5 @@
 <meta charset="utf-8">
-<title>Murdoku — generator preview</title>
+<title>Pazuru — generator preview</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -90,23 +90,23 @@
   @media (max-width: 860px) { .layout { grid-template-columns: 1fr; } }
 
   #map { background: var(--panel); border: 2px solid var(--ink); padding: 14px; }
-  .murdoku-map { width: 100%; height: auto; display: block; }
-  .murdoku-map .grid { stroke: rgba(20,24,31,.16); stroke-width: 1; fill: none; }
-  .murdoku-map .wall { stroke: var(--ink); stroke-width: 4; fill: none; stroke-linecap: square; }
-  .murdoku-map .window { fill: var(--panel); stroke: var(--ink); stroke-width: 2; }
-  .murdoku-map .room-label rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
-  .murdoku-map .room-label text {
+  .pazuru-map { width: 100%; height: auto; display: block; }
+  .pazuru-map .grid { stroke: rgba(20,24,31,.16); stroke-width: 1; fill: none; }
+  .pazuru-map .wall { stroke: var(--ink); stroke-width: 4; fill: none; stroke-linecap: square; }
+  .pazuru-map .window { fill: var(--panel); stroke: var(--ink); stroke-width: 2; }
+  .pazuru-map .room-label rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.5; }
+  .pazuru-map .room-label text {
     font-family: 'IBM Plex Mono', monospace; font-size: 9px; font-weight: 600;
     letter-spacing: .06em; fill: var(--ink);
   }
-  .murdoku-map .marker circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2.5; }
-  .murdoku-map .marker text {
+  .pazuru-map .marker circle { fill: var(--panel); stroke: var(--ink); stroke-width: 2.5; }
+  .pazuru-map .marker text {
     font-family: 'Archivo', sans-serif; font-size: 15px; font-weight: 700; fill: var(--ink);
   }
-  .murdoku-map .marker.victim circle { fill: var(--signal); stroke: var(--ink); }
-  .murdoku-map .marker.victim text { fill: var(--panel); }
-  .murdoku-map .marker.murderer circle { fill: var(--panel); stroke: var(--signal); stroke-width: 4; }
-  .murdoku-map .marker.murderer text { fill: var(--signal); }
+  .pazuru-map .marker.victim circle { fill: var(--signal); stroke: var(--ink); }
+  .pazuru-map .marker.victim text { fill: var(--panel); }
+  .pazuru-map .marker.murderer circle { fill: var(--panel); stroke: var(--signal); stroke-width: 4; }
+  .pazuru-map .marker.murderer text { fill: var(--signal); }
 
   ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 
@@ -147,7 +147,7 @@
 
 <div class="wrap">
   <header>
-    <h1>Murdoku</h1>
+    <h1>Pazuru</h1>
     <p class="tagline">Generator preview · phase 1 · engine + derived walls + tiles</p>
   </header>
 
@@ -175,7 +175,7 @@
       <ul id="suspects"></ul>
       <p class="note">
         Solid black furniture uses the supplied tiles. Outlined furniture
-        (chair, rug, TV, shelf) is a coded placeholder awaiting art.
+        (chair, sofa, table, TV) is a coded placeholder awaiting art.
         Walls are derived from the room partition, never authored.
       </p>
     </div>
